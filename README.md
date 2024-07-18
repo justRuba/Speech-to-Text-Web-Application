@@ -113,3 +113,174 @@ The main HTML file for the application, containing:
 </body>
 </html>
 ```
+
+### transcribe.php
+
+The PHP script that handles saving the transcription to the MySQL database. It:
+
+- Connects to the database.
+- Insert the transcription into the transcriptions table.
+- Provides a link to view saved transcriptions.
+
+```plaintext
+<?php
+if (isset($_POST['transcription'])) {
+    $transcription = $_POST['transcription'];
+
+    $conn = new mysqli('localhost', 'root', '', 'speech_to_text'); // Update credentials here
+
+    if ($conn->connect_error) {
+        die("Connection failed: " . $conn->connect_error);
+    }
+
+    $stmt = $conn->prepare("INSERT INTO transcriptions (text, transcription_time) VALUES (?, NOW())");
+    $stmt->bind_param('s', $transcription);
+    $stmt->execute();
+    $stmt->close();
+    $conn->close();
+
+    echo "Transcription saved successfully. <a href='view_transcriptions.php'>View transcriptions</a>";
+} else {
+    echo 'No transcription received.';
+}
+?>
+```
+
+### view_transcriptions.php
+
+The PHP script displays all saved transcriptions in a table format. It:
+
+- Connects to the database.
+- Retrieves and displays all transcriptions sorted by time.
+
+```plaintext
+<?php
+$conn = new mysqli('localhost', 'root', '', 'speech_to_text'); // Update credentials here
+
+if ($conn->connect_error) {
+    die("Connection failed: " . $conn->connect_error);
+}
+
+$sql = "SELECT id, text, transcription_time FROM transcriptions ORDER BY transcription_time DESC";
+$result = $conn->query($sql);
+?>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Transcriptions</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <h1>Saved Transcriptions</h1>
+    <table>
+        <tr>
+            <th>ID</th>
+            <th>Text</th>
+            <th>Transcription Time</th>
+        </tr>
+        <?php
+        if ($result->num_rows > 0) {
+            while ($row = $result->fetch_assoc()) {
+                echo "<tr>
+                        <td>{$row['id']}</td>
+                        <td>{$row['text']}</td>
+                        <td>{$row['transcription_time']}</td>
+                      </tr>";
+            }
+        } else {
+            echo "<tr><td colspan='3'>No transcriptions found.</td></tr>";
+        }
+        $conn->close();
+        ?>
+    </table>
+    <a href="index.html">Go back</a>
+</body>
+</html>
+```
+
+### styles.css
+
+The CSS file for styling the application. It includes:
+
+- General Styling: For layout, typography, and colors.
+- Button Styles: These are for hover effects and button appearance.
+
+```plaintext
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    margin: 0;
+    padding: 0;
+    background-color: #f0f0f0; /* Light gray background */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+}
+
+.container {
+    max-width: 600px;
+    width: 100%;
+    background-color: #ffffff; /* White background */
+    padding: 30px;
+    border-radius: 8px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    text-align: center; /* Center content */
+}
+
+.buttons {
+    margin-bottom: 20px; /* Space below buttons */
+    display: flex;
+    justify-content: center;
+}
+
+h1 {
+    color: #333;
+    text-transform: uppercase; /* Uppercase headings */
+    margin-bottom: 20px;
+}
+
+button {
+    margin: 10px;
+    padding: 12px 24px;
+    font-size: 16px;
+    background-color: #4CAF50; /* Green button */
+    color: #fff;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+button:hover {
+    background-color: #45a049; /* Darker green on hover */
+}
+
+select {
+    padding: 10px;
+    font-size: 16px;
+    margin-bottom: 20px;
+    border-radius: 4px;
+    border: 1px solid #ddd;
+    background-color: #fff;
+    cursor: pointer;
+}
+
+p {
+    margin: 10px 0;
+    color: #333;
+}
+
+a {
+    display: block; /* Display links as block elements */
+    margin-top: 20px;
+    text-align: center; /* Center align links */
+    text-decoration: none;
+    color: #007BFF;
+}
+
+a:hover {
+    text-decoration: underline;
+}
+```
