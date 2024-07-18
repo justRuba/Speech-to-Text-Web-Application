@@ -284,3 +284,12 @@ a:hover {
     text-decoration: underline;
 }
 ```
+
+## The Web Page
+
+![WhatsApp Image 2024-07-18 at 23 10 53_0cdec9cc](https://github.com/user-attachments/assets/e67112d6-0636-431f-884f-63eee2fb45e7)
+
+## The SAVED TRANSCRIPTIONS
+
+![WhatsApp Image 2024-07-18 at 23 12 40_62cdf7c1](https://github.com/user-attachments/assets/008dfca2-88ed-495b-bd1b-1d08499471f4)
+
